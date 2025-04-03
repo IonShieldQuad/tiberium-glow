@@ -1,0 +1,12 @@
+{
+  "name": "tiberium-glow",
+  "version": "1.0.0",
+  "title": "Glowing Tiberium",
+  "author": "MsBinaryLily",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.28",
+    "Factorio-Tiberium"
+  ],
+  "description": "The faint shimmering of Tiberium is not enough for you? Don't worry - with this it will glow brighter then ever!"
+}
