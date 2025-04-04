@@ -42,8 +42,8 @@ local function update_node(node)
 
     storage.nodes[node].light.color = { 0, math.sqrt(math.min(1, green_frac + (settings.global["tbg-separate-glow"].value and 0 or blue_frac))),
         math.sqrt(math.min(1, blue_frac + (settings.global["tbg-separate-glow"].value and 0 or green_frac))), 1 }
-    storage.nodes[node].light.intensity = (green_frac + blue_frac) * settings.global["tbg-intensity-mult"].value * 4
-    storage.nodes[node].light.scale = (green_frac + blue_frac) * settings.global["tbg-scale-mult"].value * 12
+    storage.nodes[node].light.intensity = math.max(0, (green_frac + blue_frac) * settings.global["tbg-intensity-mult"].value * 4)
+    storage.nodes[node].light.scale = math.max(1e-5, (green_frac + blue_frac) * settings.global["tbg-scale-mult"].value * 12)
     
 
 end
