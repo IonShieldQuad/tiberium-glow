@@ -59,6 +59,23 @@ function check_new_node(node)
         end
     end
 end
+--[[
+function check_new_laser_node(node)
+    if node and node.valid then
+        if not storage.lasers[node] or not storage.lasers[node].light or not storage.lasers[node].light.valid then
+            local light = rendering.draw_light{
+                sprite = "utility/light_medium",
+                target = node,
+                surface = node.surface,
+                position = node.position,
+                intensity = 1,
+                color = {1, 0, 0, 1}
+            }
+            storage.lasers[node] = { light = light, surface = node.surface, position = node.position }
+
+        end
+    end
+end--]]
 
 local function find_nodes()
     local node_names = {
@@ -74,14 +91,30 @@ local function find_nodes()
     end
 end
 
+--[[
+local function find_laser_nodes()
+    local node_names = {
+        "laserfence-post", "laserfence-post-gate"
+    }
+
+
+    for _, surface in pairs(game.surfaces) do
+        local nodes = surface.find_entities_filtered { name = node_names }
+        for _, node in ipairs(nodes or {}) do
+            check_new_laser_node(node)
+        end
+    end
+end--]]
 
 
 local function startup()
     storage = storage or {}
+    --storage.lasers = storage.lasers or {}
     storage.nodes = storage.nodes or {}
     storage.chunk_queue = storage.chunk_queue or {}
     storage.last = storage.last or nil
     find_nodes()
+    --find_laser_nodes()
 end
 
 script.on_init(startup)
@@ -122,3 +155,18 @@ script.on_event(defines.events.on_tick, function (event)
     
 
 end)
+--[[
+script.on_event(defines.events.on_built_entity, function (event)
+    if event.entity and event.entity.valid then
+        if event.entity.name == "laserfence-post" or event.entity.name == "laserfence-post-gate" then
+            check_new_laser_node(event.entity)
+        end
+    end
+end)
+script.on_event(defines.events.on_robot_built_entity, function(event)
+    if event.entity and event.entity.valid then
+        if event.entity.name == "laserfence-post" or event.entity.name == "laserfence-post-gate" then
+            check_new_laser_node(event.entity)
+        end
+    end
+end)--]]
