@@ -15,14 +15,14 @@ local function update_node(node)
     if not node or not node.valid or not storage.nodes[node] then
         return
     end
-    if not storage.nodes[node].light or not storage.nodes[node].light.valid then
+    if not storage.nodes[node].light or not storage.nodes[node].light.valid or not storage.nodes[node].surface or not storage.nodes[node].surface.valid then
         storage.nodes[node] = nil
     end
     local radius = settings.global["tbg-search-radius"].value
     local max_per_tile = settings.global["tbg-max-per-tile"].value
     local max_amount = math.pi * radius * radius * max_per_tile
 
-    local green_ores = storage.nodes[node].surface.find_entities_filtered{
+    local green_ores = storage.nodes[node].surface.find_entities_filtered {
         name = "tiberium-ore", position = storage.nodes[node].position, radius = radius
     }
     local blue_ores = storage.nodes[node].surface.find_entities_filtered {
@@ -40,12 +40,13 @@ local function update_node(node)
     local green_frac = green_amount / max_amount
     local blue_frac = blue_amount / max_amount
 
-    storage.nodes[node].light.color = { 0, math.sqrt(math.min(1, green_frac + (settings.global["tbg-separate-glow"].value and 0 or blue_frac))),
+    storage.nodes[node].light.color = { 0, math.sqrt(math.min(1,
+        green_frac + (settings.global["tbg-separate-glow"].value and 0 or blue_frac))),
         math.sqrt(math.min(1, blue_frac + (settings.global["tbg-separate-glow"].value and 0 or green_frac))), 1 }
-    storage.nodes[node].light.intensity = math.max(0, (green_frac + blue_frac) * settings.global["tbg-intensity-mult"].value * 4)
-    storage.nodes[node].light.scale = math.max(1e-5, (green_frac + blue_frac) * settings.global["tbg-scale-mult"].value * 12)
-    
-
+    storage.nodes[node].light.intensity = math.max(0,
+        (green_frac + blue_frac) * settings.global["tbg-intensity-mult"].value * 4)
+    storage.nodes[node].light.scale = math.max(1e-5,
+        (green_frac + blue_frac) * settings.global["tbg-scale-mult"].value * 12)
 end
 
 
@@ -59,6 +60,7 @@ function check_new_node(node)
         end
     end
 end
+
 --[[
 function check_new_laser_node(node)
     if node and node.valid then
@@ -84,9 +86,11 @@ local function find_nodes()
 
 
     for _, surface in pairs(game.surfaces) do
-        local nodes = surface.find_entities_filtered { name = node_names }
-        for _, node in ipairs(nodes or {}) do
-            check_new_node(node)
+        if surface.valid then
+            local nodes = surface.find_entities_filtered { name = node_names }
+            for _, node in ipairs(nodes or {}) do
+                check_new_node(node)
+            end
         end
     end
 end
@@ -131,7 +135,7 @@ end)
 
 
 
-script.on_event(defines.events.on_tick, function (event)
+script.on_event(defines.events.on_tick, function(event)
     local node_names = {
         "tibGrowthNode_infinite", "tibGrowthNode"
     }
@@ -140,9 +144,11 @@ script.on_event(defines.events.on_tick, function (event)
     if #storage.chunk_queue > 0 then
         local value = storage.chunk_queue[1]
         if value.tick < event.tick then
-            local nodes = value.surface.find_entities_filtered{area = value.area, name = node_names}
-            for _, node in ipairs(nodes or {}) do
-                check_new_node(node)
+            if value.surface and value.surface.valid then
+                local nodes = value.surface.findntities_filtered { area = value.area, name = node_names }
+                for _, node in ipairs(nodes or {}) do
+                    check_new_node(node)
+                end
             end
             table.remove(storage.chunk_queue, 1)
         end
@@ -152,8 +158,6 @@ script.on_event(defines.events.on_tick, function (event)
     storage.last, val = next(storage.nodes, storage.last)
 
     update_node(storage.last)
-    
-
 end)
 --[[
 script.on_event(defines.events.on_built_entity, function (event)
