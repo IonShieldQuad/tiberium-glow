@@ -174,3 +174,17 @@ script.on_event(defines.events.on_robot_built_entity, function(event)
         end
     end
 end)--]]
+
+
+commands.add_command("tib_glow_rescan", "{help.rescan}", function(command)
+    if command.parameter and (command.parameter == "--force" or command.parameter == "-f") then
+        for node, value in pairs(storage.nodes) do
+            if node.valid and value and value.light and value.light.valid then
+                value.light.destroy()
+            end
+            storage.node = nil
+        end
+    end
+    find_nodes()
+
+end)
