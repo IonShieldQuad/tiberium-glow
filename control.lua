@@ -145,7 +145,7 @@ script.on_event(defines.events.on_tick, function(event)
         local value = storage.chunk_queue[1]
         if value.tick < event.tick then
             if value.surface and value.surface.valid then
-                local nodes = value.surface.findntities_filtered { area = value.area, name = node_names }
+                local nodes = value.surface.find_entities_filtered { area = value.area, name = node_names }
                 for _, node in ipairs(nodes or {}) do
                     check_new_node(node)
                 end
