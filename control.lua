@@ -13,10 +13,11 @@ end
 
 local function update_node(node)
     if not node or not node.valid or not storage.nodes[node] then
-        return
+        return nil
     end
     if not storage.nodes[node].light or not storage.nodes[node].light.valid or not storage.nodes[node].surface or not storage.nodes[node].surface.valid then
         storage.nodes[node] = nil
+        return nil
     end
     local radius = settings.global["tbg-search-radius"].value
     local max_per_tile = settings.global["tbg-max-per-tile"].value
@@ -157,8 +158,11 @@ script.on_event(defines.events.on_tick, function(event)
     local val = {}
     storage.last, val = next(storage.nodes, storage.last)
 
-    update_node(storage.last)
+    if storage.last then
+        update_node(storage.last)
+    end
 end)
+
 --[[
 script.on_event(defines.events.on_built_entity, function (event)
     if event.entity and event.entity.valid then
@@ -176,15 +180,16 @@ script.on_event(defines.events.on_robot_built_entity, function(event)
 end)--]]
 
 
-commands.add_command("tib_glow_rescan", "{help.rescan}", function(command)
+commands.add_command("tibGlowRescan", "{help.rescan}", function(command)
     if command.parameter and (command.parameter == "--force" or command.parameter == "-f") then
         for node, value in pairs(storage.nodes) do
             if node.valid and value and value.light and value.light.valid then
                 value.light.destroy()
             end
-            storage.node = nil
+            --storage.node = nil
         end
+        storage.nodes = {}
+        storage.last = nil
     end
     find_nodes()
-
 end)
