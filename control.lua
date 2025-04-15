@@ -41,6 +41,14 @@ local function update_node(node)
     local green_frac = green_amount / max_amount
     local blue_frac = blue_amount / max_amount
 
+    if green_frac > 0.2 and blue_frac < 0.05 then
+        blue_frac = 0
+    end
+    if blue_frac > 0.2 and green_frac < 0.05 then
+        green_frac = 0
+    end
+    
+
     storage.nodes[node].light.color = { 0, math.sqrt(math.min(1,
         green_frac + (settings.global["tbg-separate-glow"].value and 0 or blue_frac))),
         math.sqrt(math.min(1, blue_frac + (settings.global["tbg-separate-glow"].value and 0 or green_frac))), 1 }
