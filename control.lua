@@ -188,7 +188,7 @@ script.on_event(defines.events.on_robot_built_entity, function(event)
 end)--]]
 
 
-commands.add_command("tibGlowRescan", "{help.rescan}", function(command)
+commands.add_command("tibGlowRescan", {"help.rescan"}, function(command)
     if command.parameter and (command.parameter == "--force" or command.parameter == "-f") then
         for node, value in pairs(storage.nodes) do
             if node.valid and value and value.light and value.light.valid then
